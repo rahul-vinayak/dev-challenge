@@ -12,33 +12,34 @@ import java.math.BigDecimal;
 @Service
 public class AccountsService {
 
-  @Getter
-  private final AccountsRepository accountsRepository;
+    @Getter
+    private final AccountsRepository accountsRepository;
 
-  private final NotificationService notificationService;
+    private final NotificationService notificationService;
 
-  @Autowired
-  public AccountsService(AccountsRepository accountsRepository, NotificationService notificationService) {
-    this.accountsRepository = accountsRepository;
-    this.notificationService = notificationService;
-  }
+    @Autowired
+    public AccountsService(AccountsRepository accountsRepository, NotificationService notificationService) {
+        this.accountsRepository = accountsRepository;
+        this.notificationService = notificationService;
+    }
 
-  public void createAccount(Account account) {
-    this.accountsRepository.createAccount(account);
-  }
+    public void createAccount(Account account) {
+        this.accountsRepository.createAccount(account);
+    }
 
-  public Account getAccount(String accountId) {
-    return this.accountsRepository.getAccount(accountId);
-  }
+    public Account getAccount(String accountId) {
+        return this.accountsRepository.getAccount(accountId);
+    }
 
-  public void transferMoney(MoneyTransfer moneyTransfer) {
-    BigDecimal amount = moneyTransfer.getAmount();
-    Account accountFrom = getAccount(moneyTransfer.getAccountFromId());
-    Account accountTo = getAccount(moneyTransfer.getAccountToId());
+    public void transferMoney(MoneyTransfer moneyTransfer) {
+        BigDecimal amount = moneyTransfer.getAmount();
+        Account accountFrom = getAccount(moneyTransfer.getAccountFromId());
+        Account accountTo = getAccount(moneyTransfer.getAccountToId());
 
-    accountsRepository.transferMoney(accountFrom, accountTo, amount);
-
-    notificationService.notifyAboutTransfer(accountFrom, "An amount of "+amount+" transferred to Account "+accountTo.getAccountId());
-    notificationService.notifyAboutTransfer(accountTo, "An amount of "+amount+" transferred from Account "+accountFrom.getAccountId());
-  }
+        if (accountFrom != null && accountTo != null) {
+            accountsRepository.transferMoney(accountFrom, accountTo, amount);
+            notificationService.notifyAboutTransfer(accountFrom, "An amount of " + amount + " transferred to Account " + accountTo.getAccountId());
+            notificationService.notifyAboutTransfer(accountTo, "An amount of " + amount + " transferred from Account " + accountFrom.getAccountId());
+        }
+    }
 }
