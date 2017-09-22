@@ -6,6 +6,7 @@ import com.db.awmd.challenge.exception.DuplicateAccountIdException;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 import com.db.awmd.challenge.exception.InsufficientFundsException;
 import org.springframework.stereotype.Repository;
@@ -36,17 +37,25 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
 
     @Override
     public void transferMoney(Account accountFrom, Account accountTo, BigDecimal amount) {
-        if (accountFrom.getBalance().compareTo(amount) == -1) {
-            throw new InsufficientFundsException(
-                    "Account id " + accountFrom.getAccountId() + " does not have sufficient funds to do this transfer");
-        }
-        settleMoney(accountFrom, accountTo, amount);
+        accounts.compute(accountFrom.getAccountId(), subtractAmountFromAccount(amount));
+        accounts.compute(accountTo.getAccountId(), addAmountToAccount(amount));
     }
 
-    private void settleMoney(Account accountFrom, Account accountTo, BigDecimal amount) {
-        accountFrom.setBalance(accountFrom.getBalance().subtract(amount));
-        accountTo.setBalance(accountTo.getBalance().add(amount));
-        accounts.put(accountFrom.getAccountId(), accountFrom);
-        accounts.put(accountTo.getAccountId(), accountTo);
+    private BiFunction<String, Account, Account> addAmountToAccount(BigDecimal amount) {
+        return (key, value) -> {
+            value.setBalance(value.getBalance().add(amount));
+            return value;
+        };
+    }
+
+    private BiFunction<String, Account, Account> subtractAmountFromAccount(BigDecimal amount) {
+        return (key, value) -> {
+            if (value.getBalance().compareTo(amount) == -1) {
+                throw new InsufficientFundsException(
+                        "Account id " + value.getAccountId() + " does not have sufficient funds to do this transfer");
+            }
+            value.setBalance(value.getBalance().subtract(amount));
+            return value;
+        };
     }
 }
