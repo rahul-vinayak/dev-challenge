@@ -33,8 +33,7 @@ run using ./gradlew bootRun
 
 </code>
 
-**THE BUILD WILL FAIL BECAUSE OF THE NEW FAILING TEST ADDED TO PROVE THREADSAFETY COMPARISON.**
 
-**TO BUILD IT SUCCESSFULLY COMMENT OUT OR IGNORE THE TESTS IN FOLLOWING FILE**
+**An Ignored Test exists in the following file which is designed to fail as it tests a non thread-safe method**
 
 <code>AccountsRepositoryInMemoryTest.java</code>
