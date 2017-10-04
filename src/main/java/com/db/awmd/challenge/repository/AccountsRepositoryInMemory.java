@@ -35,10 +35,25 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
         accounts.clear();
     }
 
+    /**
+     * to reiterate here the combination of ConcurrentHashMap and using compute method makes this transfer operation thread safe.
+     * Since Compute is an atomic operation in ConcurrentHashMap, can have a look at the docs
+     */
     @Override
     public void transferMoney(Account accountFrom, Account accountTo, BigDecimal amount) {
         accounts.compute(accountFrom.getAccountId(), subtractAmountFromAccount(amount));
         accounts.compute(accountTo.getAccountId(), addAmountToAccount(amount));
+    }
+
+    /**
+     * this method is non thread safe just to prove my concept in the tests
+     */
+    public void transferMoneyNonThreadSafe(Account accountFrom, Account accountTo, BigDecimal amount) {
+        accountFrom.setBalance(accountFrom.getBalance().subtract(amount));
+        accounts.put(accountFrom.getAccountId(), accountFrom);
+
+        accountTo.setBalance(accountTo.getBalance().add(amount));
+        accounts.put(accountTo.getAccountId(), accountTo);
     }
 
     private BiFunction<String, Account, Account> addAmountToAccount(BigDecimal amount) {
