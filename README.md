@@ -32,3 +32,9 @@ build using ./gradlew build
 run using ./gradlew bootRun
 
 </code>
+
+**THE BUILD WILL FAIL BECAUSE OF THE NEW FAILING TEST ADDED TO PROVE THREADSAFETY COMPARISON.**
+
+**TO BUILD IT SUCCESSFULLY COMMENT OUT OR IGNORE THE TESTS IN FOLLOWING FILE**
+
+<code>AccountsRepositoryInMemoryTest.java</code>
