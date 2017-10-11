@@ -3,6 +3,7 @@ package com.db.awmd.challenge.repository;
 import com.db.awmd.challenge.domain.Account;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
